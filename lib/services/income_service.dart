@@ -81,7 +81,7 @@ class IncomeService {
   }
 
   // Update income by ID
-  Future<Income> updateIncome(String id, Income income) async {
+  Future<Map<String, Object>> updateIncome(String id, Income income) async {
     try {
       final token = await _getToken();
       final response = await http.put(
@@ -90,22 +90,38 @@ class IncomeService {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token', // Include the JWT token in the headers
         },
-        body: jsonEncode(income.toMap()),
+        body: jsonEncode({
+          'amount': income.amount,
+          'category': income.category,
+          'recurring': income.recurring,
+          'note': income.note,
+          'date': income.date.toIso8601String(), // Ensure date is in ISO format
+          'userId': income.userId, // Include userId if required
+        }),
       );
 
       if (response.statusCode == 200) {
-        return Income.fromMap(jsonDecode(response.body));
+        return {
+          'success': true,
+          'message': 'Income updated successfully!',
+        };
       } else {
         final errorResponse = jsonDecode(response.body);
-        throw Exception('Failed to update income: ${errorResponse['error'] ?? 'Unknown error'}');
+        return {
+          'success': false,
+          'message': 'Failed to update Income: ${errorResponse['error'] ?? 'Unknown error'}',
+        };
       }
     } catch (e) {
       throw Exception('An error occurred: $e');
     }
+    return {};
   }
 
+
+
   // Delete income by ID
-  Future<String> deleteIncomeById(String id) async {
+  Future<Map<String, dynamic>> deleteIncomeById(String id) async {
     try {
       final token = await _getToken();
       final response = await http.delete(
@@ -116,13 +132,13 @@ class IncomeService {
       );
 
       if (response.statusCode == 200) {
-        return 'Income deleted successfully!';
+        return {'success': true, 'message': 'Income deleted successfully!'};
       } else {
         final errorResponse = jsonDecode(response.body);
-        throw Exception('Failed to delete income: ${errorResponse['error'] ?? 'Unknown error'}');
+        return {'success': false, 'message': errorResponse['error'] ?? 'Unknown error'};
       }
     } catch (e) {
-      throw Exception('An error occurred: $e');
+      return {'success': false, 'message': 'An error occurred: $e'};
     }
   }
 

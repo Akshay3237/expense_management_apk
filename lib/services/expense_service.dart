@@ -109,7 +109,7 @@ class ExpenseService {
   }
 
   // Update expense by ID
-  Future<Map<String, dynamic>> updateExpense(String id, Expense expense) async {
+  Future<Map<String, Object>> updateExpense(String id, Expense expense) async {
     try {
       final token = await _getAuthToken();
       final response = await http.put(
@@ -125,7 +125,6 @@ class ExpenseService {
         return {
           'success': true,
           'message': 'Expense updated successfully!',
-          'expense': Expense.fromMap(jsonDecode(response.body)),
         };
       } else {
         final errorResponse = jsonDecode(response.body);

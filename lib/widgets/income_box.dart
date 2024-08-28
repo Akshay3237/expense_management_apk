@@ -1,10 +1,11 @@
-import 'package:expense_tracker/comonFunctions.dart';
 import 'package:flutter/material.dart';
-import 'package:expense_tracker/models/income_model.dart'; // Import the Income model
-import 'package:expense_tracker/services/income_service.dart'; // Import the Income service
+import 'package:expense_tracker/widgets/update_income_form.dart'; // Import UpdateIncomeForm
+import 'package:expense_tracker/services/income_service.dart'; // Import IncomeService
+import 'package:expense_tracker/models/income_model.dart'; // Import Income model
+import '../comonFunctions.dart'; // Import your common functions
 
 class IncomeBox extends StatefulWidget {
-  final bool isFetchIncome; // Added to allow re-fetching data
+  final bool isFetchIncome;
 
   IncomeBox(this.isFetchIncome);
 
@@ -31,14 +32,13 @@ class _IncomeBoxState extends State<IncomeBox> {
     }
   }
 
-  // Fetch incomes using IncomeService
   Future<List<Income>> fetchIncomes() async {
     final userId = await getUserId();
     if (userId != null) {
       final incomeService = IncomeService();
       try {
         final incomes = await incomeService.getAllIncomes(); // Pass userId if needed
-        return incomes.where((expense) => expense.userId == userId).toList()?? [];
+        return incomes.where((income) => income.userId == userId).toList() ?? [];
       } catch (e) {
         throw Exception('Failed to fetch incomes: $e');
       }
@@ -47,8 +47,41 @@ class _IncomeBoxState extends State<IncomeBox> {
     }
   }
 
-  // Helper method to extract user_id from the JWT token stored in SharedPreferences
+  Future<void> _deleteIncome(String id) async {
+    try {
+      final userId = await getUserId();
+      if (userId != null) {
+        final incomeService = IncomeService();
+        final result = await incomeService.deleteIncomeById(id); // Pass userId here if needed
+        if (result['success']) {
+          setState(() {
+            _incomesFuture = fetchIncomes();
+          });
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'])));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'])));
+        }
+      } else {
+        throw Exception("Failed to get user ID from token.");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
 
+  void _openUpdateIncomeForm(Income income) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UpdateIncomeForm(income: income),
+      ),
+    ).then((_) {
+      // Refresh the income list after returning from the form
+      setState(() {
+        _incomesFuture = fetchIncomes();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,40 +116,31 @@ class _IncomeBoxState extends State<IncomeBox> {
                 itemCount: incomes.length,
                 itemBuilder: (context, index) {
                   final income = incomes[index];
+
                   return Card(
-                    elevation: 4,
-                    margin: EdgeInsets.all(10),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
+                    margin: const EdgeInsets.all(8.0),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16.0),
+                      title: Text('\$${income.amount.toStringAsFixed(2)}'),
+                      subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Amount: ₹${income.amount.toStringAsFixed(2)}', // Format amount
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Text('Category: ${income.category ?? 'Unknown'}'),
+                          Text('Recurring: ${income.recurring ? 'Yes' : 'No'}'),
+                          Text('Note: ${income.note ?? 'No notes'}'),
+                          Text('Date: ${income.date.toLocal().toString().split(' ')[0]}'), // Format date
+                        ],
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () => _openUpdateIncomeForm(income),
                           ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Category: ${income.category ?? 'No category'}',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Recurring: ${income.recurring ? 'Yes' : 'No'}',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Note: ${income.note ?? 'No note'}',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Date: ${income.date.toLocal().toString().split(' ')[0]}', // Format date
-                            style: TextStyle(fontSize: 16),
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            onPressed: () => _deleteIncome(income.id),
                           ),
                         ],
                       ),
