@@ -13,6 +13,7 @@ class ProfilePage extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () async {
             await logout(); // Call the logout function
+            Navigator.pop(context);
             Navigator.pushReplacementNamed(context, '/login'); // Redirect to the login page
           },
           child: Text('Logout'),

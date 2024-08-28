@@ -1,10 +1,13 @@
+import 'package:expense_tracker/comonFunctions.dart';
 import 'package:flutter/material.dart';
-import 'package:jwt_decode/jwt_decode.dart'; // Import jwt_decode package
-import 'package:shared_preferences/shared_preferences.dart'; // For SharedPreferences
 import 'package:expense_tracker/models/income_model.dart'; // Import the Income model
 import 'package:expense_tracker/services/income_service.dart'; // Import the Income service
 
 class IncomeBox extends StatefulWidget {
+  final bool isFetchIncome; // Added to allow re-fetching data
+
+  IncomeBox(this.isFetchIncome);
+
   @override
   _IncomeBoxState createState() => _IncomeBoxState();
 }
@@ -18,15 +21,25 @@ class _IncomeBoxState extends State<IncomeBox> {
     _incomesFuture = fetchIncomes();
   }
 
+  @override
+  void didUpdateWidget(IncomeBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isFetchIncome != oldWidget.isFetchIncome && widget.isFetchIncome) {
+      setState(() {
+        _incomesFuture = fetchIncomes();
+      });
+    }
+  }
+
   // Fetch incomes using IncomeService
   Future<List<Income>> fetchIncomes() async {
-    final userId = await _getUserIdFromToken();
+    final userId = await getUserId();
     if (userId != null) {
       final incomeService = IncomeService();
       try {
-        return await incomeService.getAllIncomes();
+        final incomes = await incomeService.getAllIncomes(); // Pass userId if needed
+        return incomes.where((expense) => expense.userId == userId).toList()?? [];
       } catch (e) {
-        // Handle any errors that occur during the fetch
         throw Exception('Failed to fetch incomes: $e');
       }
     } else {
@@ -35,18 +48,7 @@ class _IncomeBoxState extends State<IncomeBox> {
   }
 
   // Helper method to extract user_id from the JWT token stored in SharedPreferences
-  Future<String?> _getUserIdFromToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
 
-    if (token != null) {
-      Map<String, dynamic> payload = Jwt.parseJwt(token);
-      String? userId = payload['userId']; // Extract the user_id from the token
-      return userId;
-    } else {
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +58,7 @@ class _IncomeBoxState extends State<IncomeBox> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            'Incomes', // Title
+            'Incomes',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -75,7 +77,6 @@ class _IncomeBoxState extends State<IncomeBox> {
                 return Center(child: Text('No incomes found.'));
               }
 
-              // Display the list of incomes
               final incomes = snapshot.data!;
 
               return ListView.builder(

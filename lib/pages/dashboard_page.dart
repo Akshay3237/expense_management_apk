@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:expense_tracker/widgets/app_drawer.dart'; // Import the AppDrawer widget
-import 'package:expense_tracker/widgets/expense_box.dart'; // Import the ExpenseBox widget
-import 'package:expense_tracker/widgets/income_box.dart'; // Import the IncomeBox widget
+import 'package:expense_tracker/widgets/app_drawer.dart';
+import 'package:expense_tracker/widgets/expense_box.dart';
+import 'package:expense_tracker/widgets/income_box.dart';
+import 'package:expense_tracker/widgets/add_income.dart';
+import 'package:expense_tracker/widgets/add_expense.dart';
+import 'package:expense_tracker/widgets/add_category.dart';
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -10,6 +13,10 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  bool isFetchIncome = false;
+  bool isFetchExpense = false;
+
+
   @override
   void initState() {
     super.initState();
@@ -21,9 +28,68 @@ class _DashboardPageState extends State<DashboardPage> {
     String? authToken = prefs.getString('auth_token');
 
     if (authToken == null) {
-      // If no auth_token is found, navigate to the login page by URL
       Navigator.pushReplacementNamed(context, '/login');
     }
+  }
+
+  void _showAddIncomeForm() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Income'),
+          content: AddIncome(
+            onClose: () => Navigator.of(context).pop(),
+            onSuccess: () {
+              Navigator.of(context).pop();
+              setState(() {
+                isFetchIncome = true;
+              });
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddExpenseForm() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Expense'),
+          content: AddExpense(
+            onClose: () => Navigator.of(context).pop(),
+            onSuccess: () {
+              Navigator.of(context).pop();
+              setState(() {
+                isFetchExpense = true;
+              });
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  void _showAddCategoryForm() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add Category'),
+          content: AddCategory(
+            onClose: () => Navigator.of(context).pop(),
+            onSuccess: () {
+              Navigator.of(context).pop();
+              setState(() {
+
+              });
+            },
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -32,35 +98,28 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: AppBar(
         title: Text('Dashboard'),
       ),
-      drawer: AppDrawer(), // Add the AppDrawer widget here
+      drawer: AppDrawer(),
       body: Column(
         children: [
-          // Scrollable buttons
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    // Logic to insert income
-                  },
+                  onPressed: _showAddIncomeForm,
                   child: Text('Insert Income'),
                 ),
-                SizedBox(width: 16), // Add space between buttons
+                SizedBox(width: 16),
                 ElevatedButton(
-                  onPressed: () {
-                    // Logic to insert expense
-                  },
+                  onPressed: _showAddExpenseForm,
                   child: Text('Insert Expense'),
                 ),
-                SizedBox(width: 16), // Add space between buttons
+                SizedBox(width: 16),
                 ElevatedButton(
-                  onPressed: () {
-                    // Logic to insert category
-                  },
+                  onPressed: _showAddCategoryForm,
                   child: Text('Insert Category'),
                 ),
-                SizedBox(width: 16), // Add space between buttons
+                SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: () {
                     // Logic to download data
@@ -70,19 +129,17 @@ class _DashboardPageState extends State<DashboardPage> {
               ],
             ),
           ),
-          SizedBox(height: 20), // Add space between buttons and boxes
-          // Row for ExpenseBox and IncomeBox
+          SizedBox(height: 20),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Expand ExpenseBox and IncomeBox to take available space
                 Expanded(
-                  child: ExpenseBox(),
+                  child: ExpenseBox(isFetchExpense),
                 ),
-                SizedBox(width: 20), // Add space between ExpenseBox and IncomeBox
+                SizedBox(width: 20),
                 Expanded(
-                  child: IncomeBox(),
+                  child: IncomeBox(isFetchIncome),
                 ),
               ],
             ),

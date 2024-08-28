@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:expense_tracker/comonFunctions.dart';
-import 'package:expense_tracker/models/income_model.dart';
-import 'package:expense_tracker/services/income_service.dart';
+import 'package:expense_tracker/models/expense_model.dart';
+import 'package:expense_tracker/services/expense_service.dart';
 import 'package:expense_tracker/services/category_service.dart';
 import '../models/category_model.dart';
 
-class AddIncome extends StatefulWidget {
+class AddExpense extends StatefulWidget {
   final VoidCallback onClose;
   final VoidCallback onSuccess;
 
-  AddIncome({required this.onClose, required this.onSuccess});
+  AddExpense({required this.onClose, required this.onSuccess});
 
   @override
-  _AddIncomeState createState() => _AddIncomeState();
+  _AddExpenseState createState() => _AddExpenseState();
 }
 
-class _AddIncomeState extends State<AddIncome> {
+class _AddExpenseState extends State<AddExpense> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _dateController = TextEditingController();
@@ -27,9 +27,9 @@ class _AddIncomeState extends State<AddIncome> {
   String _note = '';
   bool _recurring = false;
   String _error = '';
-  bool _isLoading = false;
+  bool _isLoading = false; // Loading state
 
-  List<Category> _categories = [];
+  List<Category> _categories = []; // List of Category objects
 
   @override
   void initState() {
@@ -91,26 +91,27 @@ class _AddIncomeState extends State<AddIncome> {
   Future<void> _handleSubmit() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
-        _isLoading = true;
+        _isLoading = true; // Start loading
       });
 
       try {
         final userId = await getUserId();
         if (userId != null && _selectedCategory != null) {
-          final income = Income(
+          final expense = Expense(
             id: '',
             amount: double.tryParse(_amountController.text) ?? 0.0,
-            category: _selectedCategory!.id,
+            category: _selectedCategory!.id, // Passing category ID
             date: _date,
             note: _note,
             recurring: _recurring,
             userId: userId,
           );
 
-          final incomeService = IncomeService();
-          await incomeService.createIncome(income);
+          final expenseService = ExpenseService();
+          await expenseService.createExpense(expense);
 
           widget.onSuccess();
+
         } else {
           setState(() {
             _error = 'Failed to get user ID or category selection is missing.';
@@ -118,11 +119,11 @@ class _AddIncomeState extends State<AddIncome> {
         }
       } catch (e) {
         setState(() {
-          _error = 'Failed to create income: ${e.toString()}';
+          _error = 'Failed to create expense: ${e.toString()}';
         });
       } finally {
         setState(() {
-          _isLoading = false;
+          _isLoading = false; // Stop loading
         });
       }
     }
@@ -132,7 +133,7 @@ class _AddIncomeState extends State<AddIncome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Income'),
+        title: Text('Add Expense'),
         actions: [
           IconButton(
             icon: Icon(Icons.close),
@@ -140,8 +141,8 @@ class _AddIncomeState extends State<AddIncome> {
           )
         ],
       ),
-      body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+      body: _isLoading // Check if loading
+          ? Center(child: CircularProgressIndicator()) // Show loading indicator
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -174,7 +175,7 @@ class _AddIncomeState extends State<AddIncome> {
                 items: _categories.map((category) {
                   return DropdownMenuItem<Category>(
                     value: category,
-                    child: Text(category.name),
+                    child: Text(category.name), // Display category name
                   );
                 }).toList(),
                 onChanged: _handleCategoryChange,
@@ -233,7 +234,7 @@ class _AddIncomeState extends State<AddIncome> {
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _handleSubmit,
-                child: Text('Add Income'),
+                child: Text('Add Expense'),
               ),
               if (_error.isNotEmpty)
                 Padding(

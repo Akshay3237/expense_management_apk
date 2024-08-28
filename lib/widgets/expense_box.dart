@@ -1,10 +1,13 @@
+import 'package:expense_tracker/comonFunctions.dart';
 import 'package:flutter/material.dart';
-import 'package:jwt_decode/jwt_decode.dart'; // Import jwt_decode package
-import 'package:shared_preferences/shared_preferences.dart'; // For SharedPreferences
 import 'package:expense_tracker/models/expense_model.dart'; // Import the Expense model
 import 'package:expense_tracker/services/expense_service.dart'; // Import the Expense service
 
 class ExpenseBox extends StatefulWidget {
+  final bool isFetchExpense;
+
+  ExpenseBox(this.isFetchExpense);
+
   @override
   _ExpenseBoxState createState() => _ExpenseBoxState();
 }
@@ -18,17 +21,25 @@ class _ExpenseBoxState extends State<ExpenseBox> {
     _expensesFuture = fetchExpenses();
   }
 
+  @override
+  void didUpdateWidget(ExpenseBox oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isFetchExpense != oldWidget.isFetchExpense && widget.isFetchExpense) {
+      setState(() {
+        _expensesFuture = fetchExpenses();
+      });
+    }
+  }
+
   // Fetch expenses using ExpenseService
   Future<List<Expense>> fetchExpenses() async {
-    final userId = await _getUserIdFromToken();
+    final userId = await getUserId();
     if (userId != null) {
       final expenseService = ExpenseService();
       try {
-        // Ensure the API call returns a list of expenses
-        final expenses = await expenseService.getAllExpenses();
-        return expenses['expenses'];
+        final expenses = await expenseService.getAllExpenses(); // Ensure this method uses userId
+        return expenses['expenses'].where((expense) => expense.userId == userId).toList() ?? [];
       } catch (e) {
-        // Handle any errors that occur during the fetch
         throw Exception('Failed to fetch expenses: $e');
       }
     } else {
@@ -37,18 +48,7 @@ class _ExpenseBoxState extends State<ExpenseBox> {
   }
 
   // Helper method to extract user_id from the JWT token stored in SharedPreferences
-  Future<String?> _getUserIdFromToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token');
 
-    if (token != null) {
-      Map<String, dynamic> payload = Jwt.parseJwt(token);
-      String? userId = payload['userId']; // Extract the user_id from the token
-      return userId;
-    } else {
-      return null;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +58,7 @@ class _ExpenseBoxState extends State<ExpenseBox> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
-            'Expenses', // Title
+            'Expenses',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -77,7 +77,6 @@ class _ExpenseBoxState extends State<ExpenseBox> {
                 return Center(child: Text('No expenses found.'));
               }
 
-              // Display the list of expenses
               final expenses = snapshot.data!;
 
               return ListView.builder(
@@ -116,7 +115,7 @@ class _ExpenseBoxState extends State<ExpenseBox> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Date: ${expense.date.toLocal().toString().split(' ')[0]}', // Format date for readability
+                            'Date: ${expense.date.toLocal().toString().split(' ')[0]}',
                             style: TextStyle(fontSize: 16),
                           ),
                         ],

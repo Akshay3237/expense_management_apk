@@ -1,5 +1,3 @@
-// lib/widgets/add_category.dart
-
 import 'package:expense_tracker/comonFunctions.dart';
 import 'package:expense_tracker/models/category_model.dart';
 import 'package:expense_tracker/services/category_service.dart';
@@ -18,6 +16,7 @@ class AddCategory extends StatefulWidget {
 class _AddCategoryState extends State<AddCategory> {
   final _categoryController = TextEditingController();
   String _error = '';
+  bool _isLoading = false; // State variable for loading indicator
 
   // Handle category input change if needed
   void _handleCategoryInputChange(String value) {
@@ -37,6 +36,10 @@ class _AddCategoryState extends State<AddCategory> {
       return;
     }
 
+    setState(() {
+      _isLoading = true; // Show loading indicator
+    });
+
     try {
       final userId = await getUserId();
       if (userId != null) {
@@ -50,7 +53,7 @@ class _AddCategoryState extends State<AddCategory> {
         await categoryService.createCategory(category);
 
         widget.onSuccess(); // Call the success callback
-        widget.onClose(); // Close the form after submission
+
       } else {
         setState(() {
           _error = 'Failed to get user ID from token.';
@@ -59,6 +62,10 @@ class _AddCategoryState extends State<AddCategory> {
     } catch (e) {
       setState(() {
         _error = 'Failed to create category: ${e.toString()}';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false; // Hide loading indicator
       });
     }
   }
@@ -95,15 +102,19 @@ class _AddCategoryState extends State<AddCategory> {
                       onChanged: _handleCategoryInputChange,
                     ),
                     SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _handleCategorySubmit,
-                      child: Text('Submit'),
-                    ),
-                    SizedBox(height: 8),
-                    OutlinedButton(
-                      onPressed: _handleCategoryCancel,
-                      child: Text('Cancel'),
-                    ),
+                    if (_isLoading)
+                      CircularProgressIndicator(), // Show loading indicator
+                    if (!_isLoading) ...[
+                      ElevatedButton(
+                        onPressed: _handleCategorySubmit,
+                        child: Text('Submit'),
+                      ),
+                      SizedBox(height: 8),
+                      OutlinedButton(
+                        onPressed: _handleCategoryCancel,
+                        child: Text('Cancel'),
+                      ),
+                    ],
                     if (_error.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),

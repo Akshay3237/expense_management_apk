@@ -18,7 +18,7 @@ class Category {
     return Category(
       id: map['_id'], // MongoDB ObjectId typically maps to '_id'
       name: map['name'],
-      userId: map['user_id'],
+      userId: map['user_id']['userId'],
     );
   }
 
