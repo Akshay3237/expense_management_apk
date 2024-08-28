@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import shared_preferences
+import 'package:expense_tracker/services/login_service.dart'; // Adjust the import path accordingly
 
 class LoginPage extends StatefulWidget {
   @override
@@ -9,6 +11,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+
+  final LoginService _loginService = LoginService(); // Create an instance of LoginService
 
   @override
   Widget build(BuildContext context) {
@@ -75,15 +79,48 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 20.0), // Add vertical spacing
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      // Implement login logic here
-                      print('Email: $_email');
-                      print('Password: $_password');
+                      // Call the login service
+                      final result = await _loginService.loginUser(
+                        email: _email,
+                        password: _password,
+                      );
+
+                      if (result['success']) {
+                        // Save the token to local storage
+                        final SharedPreferences prefs = await SharedPreferences.getInstance();
+                        await prefs.setString('auth_token', result['token']);
+
+                        // Handle successful login
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(result['message'])),
+                        );
+                        // Navigate to dashboard page
+                        Navigator.pushReplacementNamed(context, '/');
+                      } else {
+                        // Handle login failure
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(result['message'])),
+                        );
+                      }
                     }
                   },
                   child: Text('Login'),
+                ),
+              ),
+              SizedBox(height: 20.0), // Add vertical spacing
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    // Redirect to the registration page
+                    Navigator.pushReplacementNamed(context, '/register');
+                  },
+                  child: Text(
+                    'Don\'t have an account? Register here',
+                    style: TextStyle(color: Colors.blue),
+                  ),
                 ),
               ),
             ],
