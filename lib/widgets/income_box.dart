@@ -23,7 +23,12 @@ class _IncomeBoxState extends State<IncomeBox> {
     final userId = await _getUserIdFromToken();
     if (userId != null) {
       final incomeService = IncomeService();
-      return await incomeService.getAllIncomes(userId);
+      try {
+        return await incomeService.getAllIncomes();
+      } catch (e) {
+        // Handle any errors that occur during the fetch
+        throw Exception('Failed to fetch incomes: $e');
+      }
     } else {
       throw Exception("Failed to get user ID from token.");
     }
@@ -86,7 +91,7 @@ class _IncomeBoxState extends State<IncomeBox> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Amount: ₹${income.amount}',
+                            'Amount: ₹${income.amount.toStringAsFixed(2)}', // Format amount
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -109,7 +114,7 @@ class _IncomeBoxState extends State<IncomeBox> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Date: ${income.date.toLocal()}',
+                            'Date: ${income.date.toLocal().toString().split(' ')[0]}', // Format date
                             style: TextStyle(fontSize: 16),
                           ),
                         ],

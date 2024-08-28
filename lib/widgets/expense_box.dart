@@ -23,7 +23,14 @@ class _ExpenseBoxState extends State<ExpenseBox> {
     final userId = await _getUserIdFromToken();
     if (userId != null) {
       final expenseService = ExpenseService();
-      return await expenseService.getAllExpenses(userId);
+      try {
+        // Ensure the API call returns a list of expenses
+        final expenses = await expenseService.getAllExpenses();
+        return expenses['expenses'];
+      } catch (e) {
+        // Handle any errors that occur during the fetch
+        throw Exception('Failed to fetch expenses: $e');
+      }
     } else {
       throw Exception("Failed to get user ID from token.");
     }
@@ -86,7 +93,7 @@ class _ExpenseBoxState extends State<ExpenseBox> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Amount: ₹${expense.amount}',
+                            'Amount: ₹${expense.amount.toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -109,7 +116,7 @@ class _ExpenseBoxState extends State<ExpenseBox> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Date: ${expense.date.toLocal()}',
+                            'Date: ${expense.date.toLocal().toString().split(' ')[0]}', // Format date for readability
                             style: TextStyle(fontSize: 16),
                           ),
                         ],

@@ -13,112 +13,138 @@ class IncomeService {
 
   // Create a new income
   Future<String> createIncome(Income income) async {
-    final token = await _getToken(); // Fetch the JWT token
-    final response = await http.post(
-      Uri.parse(INCOME_URL),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token', // Include the JWT token in the headers
-      },
-      body: jsonEncode(income.toMap()),
-    );
+    try {
+      final token = await _getToken();
+      final response = await http.post(
+        Uri.parse(INCOME_URL),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include the JWT token in the headers
+        },
+        body: jsonEncode(income.toMap()),
+      );
 
-    if (response.statusCode == 201) {
-      return 'Income created successfully!';
-    } else {
-      throw Exception('Failed to create income: ${response.body}');
+      if (response.statusCode == 201) {
+        return 'Income created successfully!';
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception('Failed to create income: ${errorResponse['error'] ?? 'Unknown error'}');
+      }
+    } catch (e) {
+      throw Exception('An error occurred: $e');
     }
   }
 
   // Get all incomes
-  Future<List<Income>> getAllIncomes(String userId) async {
-    final token = await _getToken(); // Fetch the JWT token
-    final response = await http.get(
-      Uri.parse(INCOME_URL),
-      headers: {
-        'Authorization': 'Bearer $token', // Include the JWT token in the headers
-      },
-    );
+  Future<List<Income>> getAllIncomes() async {
+    try {
+      final token = await _getToken();
+      final response = await http.get(
+        Uri.parse(INCOME_URL),
+        headers: {
+          'Authorization': 'Bearer $token', // Include the JWT token in the headers
+        },
+      );
 
-    if (response.statusCode == 200) {
-
-      List<dynamic> data = jsonDecode(response.body);
-      // Income income=Income.fromMap(data[0]);
-      // print(data[0].runtimeType);
-      return data.map((income) => Income.fromMap(income)).toList();
-
-    } else {
-      throw Exception('Failed to load incomes: ${response.body}');
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        return data.map((income) => Income.fromMap(income)).toList();
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception('Failed to load incomes: ${errorResponse['error'] ?? 'Unknown error'}');
+      }
+    } catch (e) {
+      throw Exception('An error occurred: $e');
     }
   }
 
   // Get income by ID
   Future<Income> getIncomeById(String id) async {
-    final token = await _getToken(); // Fetch the JWT token
-    final response = await http.get(
-      Uri.parse('$INCOME_URL/$id'),
-      headers: {
-        'Authorization': 'Bearer $token', // Include the JWT token in the headers
-      },
-    );
+    try {
+      final token = await _getToken();
+      final response = await http.get(
+        Uri.parse('$INCOME_URL/$id'),
+        headers: {
+          'Authorization': 'Bearer $token', // Include the JWT token in the headers
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return Income.fromMap(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load income: ${response.body}');
+      if (response.statusCode == 200) {
+        return Income.fromMap(jsonDecode(response.body));
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception('Failed to load income: ${errorResponse['error'] ?? 'Unknown error'}');
+      }
+    } catch (e) {
+      throw Exception('An error occurred: $e');
     }
   }
 
   // Update income by ID
   Future<Income> updateIncome(String id, Income income) async {
-    final token = await _getToken(); // Fetch the JWT token
-    final response = await http.put(
-      Uri.parse('$INCOME_URL/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token', // Include the JWT token in the headers
-      },
-      body: jsonEncode(income.toMap()),
-    );
+    try {
+      final token = await _getToken();
+      final response = await http.put(
+        Uri.parse('$INCOME_URL/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include the JWT token in the headers
+        },
+        body: jsonEncode(income.toMap()),
+      );
 
-    if (response.statusCode == 200) {
-      return Income.fromMap(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to update income: ${response.body}');
+      if (response.statusCode == 200) {
+        return Income.fromMap(jsonDecode(response.body));
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception('Failed to update income: ${errorResponse['error'] ?? 'Unknown error'}');
+      }
+    } catch (e) {
+      throw Exception('An error occurred: $e');
     }
   }
 
   // Delete income by ID
   Future<String> deleteIncomeById(String id) async {
-    final token = await _getToken(); // Fetch the JWT token
-    final response = await http.delete(
-      Uri.parse('$INCOME_URL/$id'),
-      headers: {
-        'Authorization': 'Bearer $token', // Include the JWT token in the headers
-      },
-    );
+    try {
+      final token = await _getToken();
+      final response = await http.delete(
+        Uri.parse('$INCOME_URL/$id'),
+        headers: {
+          'Authorization': 'Bearer $token', // Include the JWT token in the headers
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return 'Income deleted successfully!';
-    } else {
-      throw Exception('Failed to delete income: ${response.body}');
+      if (response.statusCode == 200) {
+        return 'Income deleted successfully!';
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception('Failed to delete income: ${errorResponse['error'] ?? 'Unknown error'}');
+      }
+    } catch (e) {
+      throw Exception('An error occurred: $e');
     }
   }
 
   // Delete all incomes
   Future<String> deleteAllIncomes() async {
-    final token = await _getToken(); // Fetch the JWT token
-    final response = await http.delete(
-      Uri.parse(INCOME_URL),
-      headers: {
-        'Authorization': 'Bearer $token', // Include the JWT token in the headers
-      },
-    );
+    try {
+      final token = await _getToken();
+      final response = await http.delete(
+        Uri.parse(INCOME_URL),
+        headers: {
+          'Authorization': 'Bearer $token', // Include the JWT token in the headers
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return 'All incomes deleted and archived successfully!';
-    } else {
-      throw Exception('Failed to delete all incomes: ${response.body}');
+      if (response.statusCode == 200) {
+        return 'All incomes deleted and archived successfully!';
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        throw Exception('Failed to delete all incomes: ${errorResponse['error'] ?? 'Unknown error'}');
+      }
+    } catch (e) {
+      throw Exception('An error occurred: $e');
     }
   }
 }

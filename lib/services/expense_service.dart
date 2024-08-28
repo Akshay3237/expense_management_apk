@@ -12,115 +12,195 @@ class ExpenseService {
   }
 
   // Create a new expense
-  Future<String> createExpense(Expense expense) async {
-    String? token = await _getAuthToken();
+  Future<Map<String, dynamic>> createExpense(Expense expense) async {
+    try {
+      final token = await _getAuthToken();
+      final response = await http.post(
+        Uri.parse(EXPENSE_URL),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(expense.toMap()),
+      );
 
-    final response = await http.post(
-      Uri.parse(EXPENSE_URL),
-      headers: {
-        'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(expense.toMap()),
-    );
-
-    if (response.statusCode == 201) {
-      return 'Expense created successfully!';
-    } else {
-      throw Exception('Failed to create expense: ${response.statusCode} - ${response.body}');
+      if (response.statusCode == 201) {
+        return {
+          'success': true,
+          'message': 'Expense created successfully!',
+        };
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': 'Failed to create expense: ${errorResponse['error'] ?? 'Unknown error'}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An error occurred: $e',
+      };
     }
   }
 
   // Get all expenses
-  Future<List<Expense>> getAllExpenses(String userId) async {
-    String? token = await _getAuthToken();
+  Future<Map<String, dynamic>> getAllExpenses() async {
+    try {
+      final token = await _getAuthToken();
+      final response = await http.get(
+        Uri.parse(EXPENSE_URL),
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
 
-    final response = await http.get(
-      Uri.parse(EXPENSE_URL),
-      headers: {
-        if (token != null) 'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      return data.map((expense) => Expense.fromMap(expense)).toList();
-    } else {
-      throw Exception('Failed to load expenses: ${response.statusCode} - ${response.body}');
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<Expense> expenses = data.map((expense) => Expense.fromMap(expense)).toList();
+        return {
+          'success': true,
+          'expenses': expenses,
+        };
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': 'Failed to load expenses: ${errorResponse['error'] ?? 'Unknown error'}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An error occurred: $e',
+      };
     }
   }
 
   // Get expense by ID
-  Future<Expense> getExpenseById(String id) async {
-    String? token = await _getAuthToken();
+  Future<Map<String, dynamic>> getExpenseById(String id) async {
+    try {
+      final token = await _getAuthToken();
+      final response = await http.get(
+        Uri.parse('$EXPENSE_URL/$id'),
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
 
-    final response = await http.get(
-      Uri.parse('$EXPENSE_URL/$id'),
-      headers: {
-        if (token != null) 'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return Expense.fromMap(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load expense: ${response.statusCode} - ${response.body}');
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'expense': Expense.fromMap(jsonDecode(response.body)),
+        };
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': 'Failed to load expense: ${errorResponse['error'] ?? 'Unknown error'}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An error occurred: $e',
+      };
     }
   }
 
   // Update expense by ID
-  Future<Expense> updateExpense(String id, Expense expense) async {
-    String? token = await _getAuthToken();
+  Future<Map<String, dynamic>> updateExpense(String id, Expense expense) async {
+    try {
+      final token = await _getAuthToken();
+      final response = await http.put(
+        Uri.parse('$EXPENSE_URL/$id'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode(expense.toMap()),
+      );
 
-    final response = await http.put(
-      Uri.parse('$EXPENSE_URL/$id'),
-      headers: {
-        'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(expense.toMap()),
-    );
-
-    if (response.statusCode == 200) {
-      return Expense.fromMap(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to update expense: ${response.statusCode} - ${response.body}');
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': 'Expense updated successfully!',
+          'expense': Expense.fromMap(jsonDecode(response.body)),
+        };
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': 'Failed to update expense: ${errorResponse['error'] ?? 'Unknown error'}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An error occurred: $e',
+      };
     }
   }
 
   // Delete expense by ID
-  Future<String> deleteExpenseById(String id) async {
-    String? token = await _getAuthToken();
+  Future<Map<String, dynamic>> deleteExpenseById(String id) async {
+    try {
+      final token = await _getAuthToken();
+      final response = await http.delete(
+        Uri.parse('$EXPENSE_URL/$id'),
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
 
-    final response = await http.delete(
-      Uri.parse('$EXPENSE_URL/$id'),
-      headers: {
-        if (token != null) 'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return 'Expense archived and deleted successfully!';
-    } else {
-      throw Exception('Failed to delete expense: ${response.statusCode} - ${response.body}');
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': 'Expense archived and deleted successfully!',
+        };
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': 'Failed to delete expense: ${errorResponse['error'] ?? 'Unknown error'}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An error occurred: $e',
+      };
     }
   }
 
   // Delete all expenses
-  Future<String> deleteAllExpenses() async {
-    String? token = await _getAuthToken();
+  Future<Map<String, dynamic>> deleteAllExpenses() async {
+    try {
+      final token = await _getAuthToken();
+      final response = await http.delete(
+        Uri.parse(EXPENSE_URL),
+        headers: {
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+      );
 
-    final response = await http.delete(
-      Uri.parse(EXPENSE_URL),
-      headers: {
-        if (token != null) 'Authorization': 'Bearer $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return 'All expenses archived and deleted successfully!';
-    } else {
-      throw Exception('Failed to delete all expenses: ${response.statusCode} - ${response.body}');
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': 'All expenses archived and deleted successfully!',
+        };
+      } else {
+        final errorResponse = jsonDecode(response.body);
+        return {
+          'success': false,
+          'message': 'Failed to delete all expenses: ${errorResponse['error'] ?? 'Unknown error'}',
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'An error occurred: $e',
+      };
     }
   }
 }
