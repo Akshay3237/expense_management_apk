@@ -7,7 +7,6 @@ class Notification {
   final String? budgetId; // Represents optional budget_id field
   final String message; // Represents message field
   final bool read; // Represents read field
-  final DateTime createdAt; // Represents created_at field
 
   // Constructor for the Notification class
   Notification({
@@ -16,7 +15,6 @@ class Notification {
     this.budgetId,
     required this.message,
     this.read = false,
-    required this.createdAt,
   });
 
   // Factory method to create a Notification instance from a map (e.g., JSON)
@@ -27,7 +25,6 @@ class Notification {
       budgetId: map['budget_id'],
       message: map['message'],
       read: map['read'] ?? false,
-      createdAt: DateTime.parse(map['created_at']),
     );
   }
 
@@ -39,7 +36,6 @@ class Notification {
       'budget_id': budgetId,
       'message': message,
       'read': read,
-      'created_at': createdAt.toIso8601String(),
     };
   }
 }

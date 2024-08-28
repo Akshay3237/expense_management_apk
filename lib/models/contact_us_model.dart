@@ -7,7 +7,6 @@ class ContactUs {
   final String email;
   final String description;
   final int feedbackRating;
-  final DateTime createdAt;
 
   // Constructor for the ContactUs class
   ContactUs({
@@ -16,7 +15,6 @@ class ContactUs {
     required this.email,
     required this.description,
     required this.feedbackRating,
-    required this.createdAt,
   });
 
   // Factory method to create a ContactUs instance from a map (e.g., JSON)
@@ -27,7 +25,6 @@ class ContactUs {
       email: map['email'],
       description: map['description'],
       feedbackRating: map['feedbackRating'],
-      createdAt: DateTime.parse(map['created_at']),
     );
   }
 
@@ -39,7 +36,6 @@ class ContactUs {
       'email': email,
       'description': description,
       'feedbackRating': feedbackRating,
-      'created_at': createdAt.toIso8601String(),
     };
   }
 }

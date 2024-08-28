@@ -6,7 +6,6 @@ class Collaboration {
   final String requestedUser; // Represents requested_user field
   final String requestingUser; // Represents requesting_user field
   final bool accepted;
-  final DateTime dateTime;
 
   // Constructor for the Collaboration class
   Collaboration({
@@ -14,7 +13,6 @@ class Collaboration {
     required this.requestedUser,
     required this.requestingUser,
     this.accepted = false,
-    required this.dateTime,
   });
 
   // Factory method to create a Collaboration instance from a map (e.g., JSON)
@@ -24,7 +22,6 @@ class Collaboration {
       requestedUser: map['requested_user'],
       requestingUser: map['requesting_user'],
       accepted: map['accepted'] ?? false,
-      dateTime: DateTime.parse(map['dateTime']),
     );
   }
 
@@ -35,7 +32,6 @@ class Collaboration {
       'requested_user': requestedUser,
       'requesting_user': requestingUser,
       'accepted': accepted,
-      'dateTime': dateTime.toIso8601String(),
     };
   }
 }

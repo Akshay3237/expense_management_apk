@@ -9,7 +9,6 @@ class Expense {
   final bool recurring; // Represents recurring field
   final String category; // Represents category field
   final String? note; // Represents note field (optional)
-  final DateTime createdAt; // Represents created_at field
 
   // Constructor for the Expense class
   Expense({
@@ -20,7 +19,6 @@ class Expense {
     required this.recurring,
     required this.category,
     this.note,
-    required this.createdAt,
   });
 
   // Factory method to create an Expense instance from a map (e.g., JSON)
@@ -33,7 +31,6 @@ class Expense {
       recurring: map['recurring'],
       category: map['category']['name'],
       note: map['note'],
-      createdAt: DateTime.parse(map['created_at']),
     );
   }
 
@@ -47,7 +44,6 @@ class Expense {
       'recurring': recurring,
       'category': category,
       'note': note,
-      'created_at': createdAt.toIso8601String(),
     };
   }
 }

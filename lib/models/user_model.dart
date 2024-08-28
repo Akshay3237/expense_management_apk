@@ -10,7 +10,6 @@ class User {
   final String email;
   final String profession;
   final String password;
-  final DateTime createdAt;
   final String profilePicture;
   final String role;
 
@@ -24,7 +23,6 @@ class User {
     required this.email,
     required this.profession,
     required this.password,
-    required this.createdAt,
     this.profilePicture = 'defaultProfilePicture', // Default value for profilePicture
     this.role = 'user', // Default value for role
   });
@@ -40,7 +38,6 @@ class User {
       email: map['email'],
       profession: map['profession'],
       password: map['password'],
-      createdAt: DateTime.parse(map['created_at']),
       profilePicture: map['profilePicture'] ?? 'defaultProfilePicture',
       role: map['role'] ?? 'user',
     );
@@ -57,7 +54,6 @@ class User {
       'email': email,
       'profession': profession,
       'password': password,
-      'created_at': createdAt.toIso8601String(),
       'profilePicture': profilePicture,
       'role': role,
     };

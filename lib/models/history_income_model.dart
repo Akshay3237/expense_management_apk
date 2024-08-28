@@ -8,7 +8,6 @@ class HistoryIncome {
   final DateTime date; // Represents date field
   final String category; // Represents category field
   final String? description; // Represents optional description field
-  final DateTime createdAt; // Represents created_at field
 
   // Constructor for the HistoryIncome class
   HistoryIncome({
@@ -18,7 +17,6 @@ class HistoryIncome {
     required this.date,
     required this.category,
     this.description,
-    required this.createdAt,
   });
 
   // Factory method to create a HistoryIncome instance from a map (e.g., JSON)
@@ -30,7 +28,6 @@ class HistoryIncome {
       date: DateTime.parse(map['date']),
       category: map['category'],
       description: map['description'],
-      createdAt: DateTime.parse(map['created_at']),
     );
   }
 
@@ -43,7 +40,6 @@ class HistoryIncome {
       'date': date.toIso8601String(),
       'category': category,
       'description': description,
-      'created_at': createdAt.toIso8601String(),
     };
   }
 }

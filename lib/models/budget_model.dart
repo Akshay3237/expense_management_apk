@@ -7,7 +7,6 @@ class Budget {
   final String categoryId;
   final DateTime startDate;
   final DateTime endDate;
-  final DateTime createdAt;
 
   // Constructor for the Budget class
   Budget({
@@ -16,7 +15,6 @@ class Budget {
     required this.categoryId,
     required this.startDate,
     required this.endDate,
-    required this.createdAt,
   });
 
   // Factory method to create a Budget instance from a map (e.g., JSON)
@@ -27,7 +25,6 @@ class Budget {
       categoryId: map['category'],
       startDate: DateTime.parse(map['start_date']),
       endDate: DateTime.parse(map['end_date']),
-      createdAt: DateTime.parse(map['created_at']),
     );
   }
 
@@ -39,7 +36,6 @@ class Budget {
       'category': categoryId,
       'start_date': startDate.toIso8601String(),
       'end_date': endDate.toIso8601String(),
-      'created_at': createdAt.toIso8601String(),
     };
   }
 }

@@ -9,7 +9,6 @@ class Income {
   final bool recurring; // Represents recurring field
   final String? category; // Represents category field
   final String? note; // Represents optional note field
-  final DateTime createdAt; // Represents created_at field
 
   // Constructor for the Income class
   Income({
@@ -20,7 +19,6 @@ class Income {
     this.recurring = false,
     this.category,
     this.note,
-    required this.createdAt,
   });
 
   // Factory method to create an Income instance from a map (e.g., JSON)
@@ -31,9 +29,8 @@ class Income {
       amount: map['amount'].toDouble(),
       date: DateTime.parse(map['date']),
       recurring: map['recurring'] ?? false,
-      category: map['category']['name'],
+      category: map['category']?['name'],
       note: map['note'],
-      createdAt: DateTime.parse(map['created_at']),
     );
   }
 
@@ -47,7 +44,6 @@ class Income {
       'recurring': recurring,
       'category': category,
       'note': note,
-      'created_at': createdAt.toIso8601String(),
     };
   }
 }

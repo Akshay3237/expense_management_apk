@@ -8,7 +8,6 @@ class HistoryExpense {
   final DateTime date; // Represents date field
   final String category; // Represents category field
   final String description; // Represents description field
-  final DateTime createdAt; // Represents created_at field
 
   // Constructor for the HistoryExpense class
   HistoryExpense({
@@ -18,7 +17,6 @@ class HistoryExpense {
     required this.date,
     required this.category,
     required this.description,
-    required this.createdAt,
   });
 
   // Factory method to create a HistoryExpense instance from a map (e.g., JSON)
@@ -30,7 +28,6 @@ class HistoryExpense {
       date: DateTime.parse(map['date']),
       category: map['category'],
       description: map['description'],
-      createdAt: DateTime.parse(map['created_at']),
     );
   }
 
@@ -43,7 +40,6 @@ class HistoryExpense {
       'date': date.toIso8601String(),
       'category': category,
       'description': description,
-      'created_at': createdAt.toIso8601String(),
     };
   }
 }
