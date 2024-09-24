@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 
 // Define a class to represent the Collaboration model
 class Collaboration {
-  final String id; // Assuming the ObjectId will be used as a String
-  final String requestedUser; // Represents requested_user field
-  final String requestingUser; // Represents requesting_user field
-  final bool accepted;
+   String? id; // Assuming the ObjectId will be used as a String
+   String? requestedUser; // Represents requested_user field
+   String? requestingUser; // Represents requesting_user field
+   bool accepted;
 
   // Constructor for the Collaboration class
   Collaboration({
-    required this.id,
-    required this.requestedUser,
-    required this.requestingUser,
+     this.id,
+     this.requestedUser,
+     this.requestingUser,
     this.accepted = false,
   });
 
@@ -19,8 +19,8 @@ class Collaboration {
   factory Collaboration.fromMap(Map<String, dynamic> map) {
     return Collaboration(
       id: map['_id'], // MongoDB ObjectId typically maps to '_id'
-      requestedUser: map['requested_user'],
-      requestingUser: map['requesting_user'],
+      requestedUser: map['requested_user']['id'],
+      requestingUser: map['requesting_user']['id'],
       accepted: map['accepted'] ?? false,
     );
   }
@@ -35,3 +35,4 @@ class Collaboration {
     };
   }
 }
+

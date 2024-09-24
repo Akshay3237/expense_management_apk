@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:expense_tracker/widgets/update_income_form.dart'; // Import UpdateIncomeForm
-import 'package:expense_tracker/services/income_service.dart'; // Import IncomeService
-import 'package:expense_tracker/models/income_model.dart'; // Import Income model
-import '../comonFunctions.dart'; // Import your common functions
+import 'package:expense_tracker/widgets/update_income_form.dart';
+import 'package:expense_tracker/services/income_service.dart';
+import 'package:expense_tracker/models/income_model.dart';
+import '../comonFunctions.dart';
 
 class IncomeBox extends StatefulWidget {
   final bool isFetchIncome;
@@ -37,7 +37,7 @@ class _IncomeBoxState extends State<IncomeBox> {
     if (userId != null) {
       final incomeService = IncomeService();
       try {
-        final incomes = await incomeService.getAllIncomes(); // Pass userId if needed
+        final incomes = await incomeService.getAllIncomes();
         return incomes.where((income) => income.userId == userId).toList() ?? [];
       } catch (e) {
         throw Exception('Failed to fetch incomes: $e');
@@ -52,7 +52,7 @@ class _IncomeBoxState extends State<IncomeBox> {
       final userId = await getUserId();
       if (userId != null) {
         final incomeService = IncomeService();
-        final result = await incomeService.deleteIncomeById(id); // Pass userId here if needed
+        final result = await incomeService.deleteIncomeById(id);
         if (result['success']) {
           setState(() {
             _incomesFuture = fetchIncomes();
@@ -76,7 +76,6 @@ class _IncomeBoxState extends State<IncomeBox> {
         builder: (context) => UpdateIncomeForm(income: income),
       ),
     ).then((_) {
-      // Refresh the income list after returning from the form
       setState(() {
         _incomesFuture = fetchIncomes();
       });
@@ -85,6 +84,10 @@ class _IncomeBoxState extends State<IncomeBox> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double titleFontSize = screenWidth * 0.05;
+    double subtitleFontSize = screenWidth * 0.04;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -93,7 +96,7 @@ class _IncomeBoxState extends State<IncomeBox> {
           child: Text(
             'Incomes',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -119,28 +122,33 @@ class _IncomeBoxState extends State<IncomeBox> {
 
                   return Card(
                     margin: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(16.0),
-                      title: Text('\$${income.amount.toStringAsFixed(2)}'),
-                      subtitle: Column(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Category: ${income.category ?? 'Unknown'}'),
-                          Text('Recurring: ${income.recurring ? 'Yes' : 'No'}'),
-                          Text('Note: ${income.note ?? 'No notes'}'),
-                          Text('Date: ${income.date.toLocal().toString().split(' ')[0]}'), // Format date
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () => _openUpdateIncomeForm(income),
+                          Text(
+                            '\$${income.amount.toStringAsFixed(2)}',
+                            style: TextStyle(fontSize: subtitleFontSize),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () => _deleteIncome(income.id),
+                          SizedBox(height: 8.0),
+                          Text('Category: ${income.category ?? 'Unknown'}', style: TextStyle(fontSize: subtitleFontSize)),
+                          Text('Recurring: ${income.recurring ? 'Yes' : 'No'}', style: TextStyle(fontSize: subtitleFontSize)),
+                          Text('Note: ${income.note ?? 'No notes'}', style: TextStyle(fontSize: subtitleFontSize)),
+                          Text('Date: ${income.date.toLocal().toString().split(' ')[0]}', style: TextStyle(fontSize: subtitleFontSize)),
+                          SizedBox(height: 16.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () => _openUpdateIncomeForm(income),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => _deleteIncome(income.id),
+                              ),
+                            ],
                           ),
                         ],
                       ),

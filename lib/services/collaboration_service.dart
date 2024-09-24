@@ -127,7 +127,7 @@ class CollaborationService {
         return {
           'success': true,
           'message': 'Collaboration request updated successfully!',
-          'collaboration': Collaboration.fromMap(jsonDecode(response.body)),
+
         };
       } else {
         final errorResponse = jsonDecode(response.body);

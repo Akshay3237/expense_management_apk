@@ -23,10 +23,10 @@ class HistoryExpense {
   factory HistoryExpense.fromMap(Map<String, dynamic> map) {
     return HistoryExpense(
       id: map['_id'], // MongoDB ObjectId typically maps to '_id'
-      userId: map['user_id'],
+      userId: map['user_id']['_id'],
       amount: map['amount'].toDouble(),
       date: DateTime.parse(map['date']),
-      category: map['category'],
+      category: map['category']['name'],
       description: map['description'],
     );
   }

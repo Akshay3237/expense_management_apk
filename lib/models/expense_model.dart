@@ -23,6 +23,7 @@ class Expense {
 
   // Factory method to create an Expense instance from a map (e.g., JSON)
   factory Expense.fromMap(Map<String, dynamic> map) {
+
     return Expense(
       id: map['_id'], // MongoDB ObjectId typically maps to '_id'
       userId: map['user_id']['_id'],

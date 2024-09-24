@@ -21,9 +21,9 @@ class _RegisterPageState extends State<RegisterPage> {
   String _password = '';
   String _confirmPassword = '';
 
-  // Visibility toggle states for password fields
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
+  bool _isLoading = false; // New state to track loading
 
   @override
   Widget build(BuildContext context) {
@@ -35,168 +35,143 @@ class _RegisterPageState extends State<RegisterPage> {
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: ListView(
+        child: Stack(
           children: [
-            SizedBox(height: 16.0),
-            buildInputField(
-              context,
-              screenWidth,
-              label: 'First Name',
-              onChanged: (value) {
-                _firstName = value ?? '';
-              },
-            ),
-            SizedBox(height: 16.0),
-            buildInputField(
-              context,
-              screenWidth,
-              label: 'Surname',
-              onChanged: (value) {
-                _surname = value ?? '';
-              },
-            ),
-            SizedBox(height: 16.0),
-            Text('Select Gender', textAlign: TextAlign.center),
-            buildGenderRadioTile(context, 'male'),
-            buildGenderRadioTile(context, 'female'),
-            buildGenderRadioTile(context, 'other'),
-            SizedBox(height: 16.0),
-            buildInputField(
-              context,
-              screenWidth,
-              label: 'Full Name',
-              onChanged: (value) {
-                _fullName = value ?? '';
-              },
-            ),
-            SizedBox(height: 16.0),
-            buildInputField(
-              context,
-              screenWidth,
-              label: 'Mobile No',
-              keyboardType: TextInputType.phone,
-              onChanged: (value) {
-                _mobileNo = value ?? '';
-              },
-            ),
-            SizedBox(height: 16.0),
-            buildInputField(
-              context,
-              screenWidth,
-              label: 'Email',
-              keyboardType: TextInputType.emailAddress,
-              suffixIcon: ElevatedButton(
-                onPressed: () {
-                  // Implement OTP sending logic here
-                },
-                child: Text('Send OTP'),
-              ),
-              onChanged: (value) {
-                _email = value ?? '';
-              },
-            ),
-            SizedBox(height: 16.0),
-            buildInputField(
-              context,
-              screenWidth,
-              label: 'OTP',
-              onChanged: (value) {
-                _otp = value ?? '';
-              },
-            ),
-            SizedBox(height: 16.0),
-            buildDropdownField(
-              context,
-              screenWidth,
-              label: 'Select Profession',
-              value: _profession,
-              items: ['Developer', 'Designer']
-                  .map((profession) => DropdownMenuItem<String>(
-                value: profession,
-                child: Text(profession),
-              ))
-                  .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _profession = value;
-                });
-              },
-            ),
-            SizedBox(height: 16.0),
-            buildInputField(
-              context,
-              screenWidth,
-              label: 'Password',
-              obscureText: !_passwordVisible,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _passwordVisible ? Icons.visibility : Icons.visibility_off,
+            ListView(
+              children: [
+                SizedBox(height: 16.0),
+                buildInputField(
+                  context,
+                  screenWidth,
+                  label: 'First Name',
+                  onChanged: (value) {
+                    _firstName = value ?? '';
+                  },
                 ),
-                onPressed: () {
-                  setState(() {
-                    _passwordVisible = !_passwordVisible;
-                  });
-                },
-              ),
-              onChanged: (value) {
-                _password = value ?? '';
-              },
-            ),
-            SizedBox(height: 16.0),
-            buildInputField(
-              context,
-              screenWidth,
-              label: 'Confirm Password',
-              obscureText: !_confirmPasswordVisible,
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _confirmPasswordVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
+                SizedBox(height: 16.0),
+                buildInputField(
+                  context,
+                  screenWidth,
+                  label: 'Surname',
+                  onChanged: (value) {
+                    _surname = value ?? '';
+                  },
                 ),
-                onPressed: () {
-                  setState(() {
-                    _confirmPasswordVisible = !_confirmPasswordVisible;
-                  });
-                },
-              ),
-              onChanged: (value) {
-                _confirmPassword = value ?? '';
-              },
+                SizedBox(height: 16.0),
+                Text('Select Gender', textAlign: TextAlign.center),
+                buildGenderRadioTile(context, 'male'),
+                buildGenderRadioTile(context, 'female'),
+                buildGenderRadioTile(context, 'other'),
+                SizedBox(height: 16.0),
+                buildInputField(
+                  context,
+                  screenWidth,
+                  label: 'Full Name',
+                  onChanged: (value) {
+                    _fullName = value ?? '';
+                  },
+                ),
+                SizedBox(height: 16.0),
+                buildInputField(
+                  context,
+                  screenWidth,
+                  label: 'Mobile No',
+                  keyboardType: TextInputType.phone,
+                  onChanged: (value) {
+                    _mobileNo = value ?? '';
+                  },
+                ),
+                SizedBox(height: 16.0),
+                buildInputField(
+                  context,
+                  screenWidth,
+                  label: 'Email',
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (value) {
+                    _email = value ?? '';
+                  },
+                ),
+                SizedBox(height: 16.0),
+                buildDropdownField(
+                  context,
+                  screenWidth,
+                  label: 'Select Profession',
+                  value: _profession,
+                  items: ['Developer', 'Designer']
+                      .map((profession) => DropdownMenuItem<String>(
+                    value: profession,
+                    child: Text(profession),
+                  ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _profession = value;
+                    });
+                  },
+                ),
+                SizedBox(height: 16.0),
+                buildInputField(
+                  context,
+                  screenWidth,
+                  label: 'Password',
+                  obscureText: !_passwordVisible,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _passwordVisible = !_passwordVisible;
+                      });
+                    },
+                  ),
+                  onChanged: (value) {
+                    _password = value ?? '';
+                  },
+                ),
+                SizedBox(height: 16.0),
+                buildInputField(
+                  context,
+                  screenWidth,
+                  label: 'Confirm Password',
+                  obscureText: !_confirmPasswordVisible,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _confirmPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _confirmPasswordVisible = !_confirmPasswordVisible;
+                      });
+                    },
+                  ),
+                  onChanged: (value) {
+                    _confirmPassword = value ?? '';
+                  },
+                ),
+                SizedBox(height: 20.0),
+                Center(
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: _isLoading ? null : _registerUser,
+                        child: Text('Register'),
+                      ),
+                      SizedBox(height: 20.0,),
+                      TextButton(onPressed: ()=>
+                        Navigator.pushReplacementNamed(context, "/login")
+                      , child: Text("Already have an account, click here"))
+                    ],
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 20.0),
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  // Send data to the RegisterService without validation
-                  try {
-                    final result = await _registerService.registerUser(
-                      firstName: _firstName,
-                      surname: _surname,
-                      fullName: _fullName,
-                      gender: _gender!,
-                      mobileno: _mobileNo,
-                      email: _email,
-                      profession: _profession!,
-                      password: _password,
-                    );
-
-                    if (result['success']) {
-                      Navigator.pushReplacementNamed(context, '/login');
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result['message'])),
-                      );
-                    }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Error: $e")),
-                    );
-                  }
-                },
-                child: Text('Register'),
+            if (_isLoading)
+              Center(
+                child: CircularProgressIndicator(), // Show loading spinner
               ),
-            ),
           ],
         ),
       ),
@@ -267,5 +242,40 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _registerUser() async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+
+    try {
+      final result = await _registerService.registerUser(
+        firstName: _firstName,
+        surname: _surname,
+        fullName: _fullName,
+        gender: _gender!,
+        mobileno: _mobileNo,
+        email: _email,
+        profession: _profession!,
+        password: _password,
+      );
+
+      if (result['success']) {
+        Navigator.pushReplacementNamed(context, '/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'])),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false; // Stop loading
+      });
+    }
   }
 }

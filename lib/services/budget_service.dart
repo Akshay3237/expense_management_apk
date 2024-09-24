@@ -26,11 +26,13 @@ class BudgetService {
         body: jsonEncode(budget.toMap()),
       );
 
+
       if (response.statusCode == 201) {
         return {
           'success': true,
           'message': 'Budget created successfully!',
-          'budget': Budget.fromMap(jsonDecode(response.body)),
+
+
         };
       } else {
         final errorResponse = jsonDecode(response.body);

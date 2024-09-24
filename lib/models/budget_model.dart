@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // Define a class to represent the Budget model
 class Budget {
+  final String id;
   final String userId;
   final double amount;
   final String categoryId;
@@ -10,6 +11,7 @@ class Budget {
 
   // Constructor for the Budget class
   Budget({
+    required this.id,
     required this.userId,
     required this.amount,
     required this.categoryId,
@@ -17,16 +19,19 @@ class Budget {
     required this.endDate,
   });
 
+
   // Factory method to create a Budget instance from a map (e.g., JSON)
   factory Budget.fromMap(Map<String, dynamic> map) {
     return Budget(
-      userId: map['user_id'],
+      id: map['_id'],
+      userId: map['user_id']['userId'],
       amount: map['amount'].toDouble(),
-      categoryId: map['category'],
+      categoryId: map['category']['_id'],
       startDate: DateTime.parse(map['start_date']),
       endDate: DateTime.parse(map['end_date']),
     );
   }
+
 
   // Convert the Budget instance to a map (e.g., for JSON serialization)
   Map<String, dynamic> toMap() {

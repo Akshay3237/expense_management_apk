@@ -45,8 +45,13 @@ class _AddIncomeState extends State<AddIncome> {
 
       if (result['success']) {
         final categories = result['categories'] as List<Category>;
+        String userId = (await getUserId())!;
+        // Filter categories based on userId
+        List<Category> filteredCategories = categories
+            .where((category) => category.userId == userId)
+            .toList();
         setState(() {
-          _categories = categories;
+          _categories = filteredCategories;
           if (_categories.isNotEmpty) {
             _selectedCategory = _categories.first;
           }

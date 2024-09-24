@@ -2,15 +2,24 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:expense_tracker/models/history_expense_model.dart'; // Import your HistoryExpense model
 import 'package:expense_tracker/constants.dart'; // Import your constants
+import 'package:shared_preferences/shared_preferences.dart'; // For accessing stored token
 
 class HistoryExpenseService {
+  // Fetch the JWT token from SharedPreferences
+  Future<String?> _getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('auth_token'); // Get the JWT token from storage
+  }
+
   // Create a new history expense record
   Future<Map<String, dynamic>> createHistoryExpense(HistoryExpense historyExpense) async {
     try {
+      final token = await _getToken(); // Fetch the token
       final response = await http.post(
         Uri.parse(HISTORY_EXPENSE_URL),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
         },
         body: jsonEncode(historyExpense.toMap()),
       );
@@ -38,7 +47,13 @@ class HistoryExpenseService {
   // Get all history expense records
   Future<Map<String, dynamic>> getAllHistoryExpenses() async {
     try {
-      final response = await http.get(Uri.parse(HISTORY_EXPENSE_URL));
+      final token = await _getToken(); // Fetch the token
+      final response = await http.get(
+        Uri.parse(HISTORY_EXPENSE_URL),
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
+        },
+      );
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
@@ -65,7 +80,13 @@ class HistoryExpenseService {
   // Get history expense record by ID
   Future<Map<String, dynamic>> getHistoryExpenseById(String id) async {
     try {
-      final response = await http.get(Uri.parse('$HISTORY_EXPENSE_URL/$id'));
+      final token = await _getToken(); // Fetch the token
+      final response = await http.get(
+        Uri.parse('$HISTORY_EXPENSE_URL/$id'),
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
+        },
+      );
 
       if (response.statusCode == 200) {
         return {
@@ -90,10 +111,12 @@ class HistoryExpenseService {
   // Update history expense record by ID
   Future<Map<String, dynamic>> updateHistoryExpense(String id, HistoryExpense historyExpense) async {
     try {
+      final token = await _getToken(); // Fetch the token
       final response = await http.put(
         Uri.parse('$HISTORY_EXPENSE_URL/$id'),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
         },
         body: jsonEncode(historyExpense.toMap()),
       );
@@ -122,7 +145,13 @@ class HistoryExpenseService {
   // Delete history expense record by ID
   Future<Map<String, dynamic>> deleteHistoryExpenseById(String id) async {
     try {
-      final response = await http.delete(Uri.parse('$HISTORY_EXPENSE_URL/$id'));
+      final token = await _getToken(); // Fetch the token
+      final response = await http.delete(
+        Uri.parse('$HISTORY_EXPENSE_URL/$id'),
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
+        },
+      );
 
       if (response.statusCode == 200) {
         return {
@@ -147,7 +176,13 @@ class HistoryExpenseService {
   // Delete all history expense records
   Future<Map<String, dynamic>> deleteAllHistoryExpenses() async {
     try {
-      final response = await http.delete(Uri.parse(HISTORY_EXPENSE_URL));
+      final token = await _getToken(); // Fetch the token
+      final response = await http.delete(
+        Uri.parse(HISTORY_EXPENSE_URL),
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
+        },
+      );
 
       if (response.statusCode == 200) {
         return {

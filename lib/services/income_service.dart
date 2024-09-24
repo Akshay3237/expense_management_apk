@@ -45,7 +45,7 @@ class IncomeService {
           'Authorization': 'Bearer $token', // Include the JWT token in the headers
         },
       );
-
+      print(response);
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
         return data.map((income) => Income.fromMap(income)).toList();
@@ -115,7 +115,7 @@ class IncomeService {
     } catch (e) {
       throw Exception('An error occurred: $e');
     }
-    return {};
+
   }
 
 

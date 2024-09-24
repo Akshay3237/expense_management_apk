@@ -23,13 +23,14 @@ class HistoryIncome {
   factory HistoryIncome.fromMap(Map<String, dynamic> map) {
     return HistoryIncome(
       id: map['_id'], // MongoDB ObjectId typically maps to '_id'
-      userId: map['user_id'],
+      userId: map['user_id']['_id'],
       amount: map['amount'].toDouble(),
       date: DateTime.parse(map['date']),
-      category: map['category'],
+      category: map['category']['name'],
       description: map['description'],
     );
   }
+
 
   // Convert the HistoryIncome instance to a map (e.g., for JSON serialization)
   Map<String, dynamic> toMap() {

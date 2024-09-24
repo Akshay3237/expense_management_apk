@@ -2,15 +2,24 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:expense_tracker/models/history_income_model.dart'; // Import your HistoryIncome model
 import 'package:expense_tracker/constants.dart'; // Import your constants
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HistoryIncomeService {
+  // Fetch the JWT token from SharedPreferences
+  Future<String?> _getToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('auth_token'); // Get the JWT token from storage
+  }
+
   // Create a new history income record
   Future<Map<String, dynamic>> createHistoryIncome(HistoryIncome historyIncome) async {
     try {
+      final token = await _getToken(); // Fetch the token
       final response = await http.post(
         Uri.parse(HISTORY_INCOME_URL),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
         },
         body: jsonEncode(historyIncome.toMap()),
       );
@@ -38,7 +47,13 @@ class HistoryIncomeService {
   // Get all history income records
   Future<Map<String, dynamic>> getAllHistoryIncomes() async {
     try {
-      final response = await http.get(Uri.parse(HISTORY_INCOME_URL));
+      final token = await _getToken(); // Fetch the token
+      final response = await http.get(
+        Uri.parse(HISTORY_INCOME_URL),
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
+        },
+      );
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
@@ -65,7 +80,13 @@ class HistoryIncomeService {
   // Get history income record by ID
   Future<Map<String, dynamic>> getHistoryIncomeById(String id) async {
     try {
-      final response = await http.get(Uri.parse('$HISTORY_INCOME_URL/$id'));
+      final token = await _getToken(); // Fetch the token
+      final response = await http.get(
+        Uri.parse('$HISTORY_INCOME_URL/$id'),
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
+        },
+      );
 
       if (response.statusCode == 200) {
         return {
@@ -90,10 +111,12 @@ class HistoryIncomeService {
   // Update history income record by ID
   Future<Map<String, dynamic>> updateHistoryIncome(String id, HistoryIncome historyIncome) async {
     try {
+      final token = await _getToken(); // Fetch the token
       final response = await http.put(
         Uri.parse('$HISTORY_INCOME_URL/$id'),
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
         },
         body: jsonEncode(historyIncome.toMap()),
       );
@@ -122,7 +145,13 @@ class HistoryIncomeService {
   // Delete history income record by ID
   Future<Map<String, dynamic>> deleteHistoryIncomeById(String id) async {
     try {
-      final response = await http.delete(Uri.parse('$HISTORY_INCOME_URL/$id'));
+      final token = await _getToken(); // Fetch the token
+      final response = await http.delete(
+        Uri.parse('$HISTORY_INCOME_URL/$id'),
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
+        },
+      );
 
       if (response.statusCode == 200) {
         return {
@@ -147,7 +176,13 @@ class HistoryIncomeService {
   // Delete all history income records
   Future<Map<String, dynamic>> deleteAllHistoryIncomes() async {
     try {
-      final response = await http.delete(Uri.parse(HISTORY_INCOME_URL));
+      final token = await _getToken(); // Fetch the token
+      final response = await http.delete(
+        Uri.parse(HISTORY_INCOME_URL),
+        headers: {
+          'Authorization': 'Bearer $token', // Add the token to the Authorization header
+        },
+      );
 
       if (response.statusCode == 200) {
         return {

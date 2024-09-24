@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // Define a class to represent the User model
 class User {
+  String? userid;
   final String firstName;
   final String surname;
   final String fullName;
@@ -14,7 +15,7 @@ class User {
   final String role;
 
   // Constructor for the User class
-  User({
+  User({this.userid,
     required this.firstName,
     required this.surname,
     required this.fullName,
@@ -30,6 +31,7 @@ class User {
   // Factory method to create a User instance from a map (e.g., JSON)
   factory User.fromMap(Map<String, dynamic> map) {
     return User(
+      userid: map['id'],
       firstName: map['firstName'],
       surname: map['surname'],
       fullName: map['fullName'],

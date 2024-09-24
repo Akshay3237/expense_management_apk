@@ -11,6 +11,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
+  bool _isLoading = false; // For showing the loading indicator
+  bool _isPasswordVisible = false; // For toggling password visibility
 
   final LoginService _loginService = LoginService(); // Create an instance of LoginService
 
@@ -62,8 +64,20 @@ class _LoginPageState extends State<LoginPage> {
                       border: OutlineInputBorder(),
                       filled: true,
                       fillColor: Colors.lightBlue[50],
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
                     ),
-                    obscureText: true,
+                    obscureText: !_isPasswordVisible, // Toggle visibility
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your password';
@@ -78,15 +92,24 @@ class _LoginPageState extends State<LoginPage> {
               ),
               SizedBox(height: 20.0), // Add vertical spacing
               Center(
-                child: ElevatedButton(
+                child: _isLoading
+                    ? CircularProgressIndicator() // Show loading indicator
+                    : ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
+                      setState(() {
+                        _isLoading = true; // Start loading
+                      });
                       // Call the login service
                       final result = await _loginService.loginUser(
                         email: _email,
                         password: _password,
                       );
+
+                      setState(() {
+                        _isLoading = false; // Stop loading
+                      });
 
                       if (result['success']) {
                         // Save the token to local storage

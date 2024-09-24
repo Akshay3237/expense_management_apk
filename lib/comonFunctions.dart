@@ -1,5 +1,6 @@
 // File: lib/commonFunctions.dart
 
+import 'package:flutter/cupertino.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,5 +20,15 @@ Future<String?> getUserId() async {
   } else {
     // Return null if no token is found
     return null;
+  }
+}
+
+Future<void> checkAuthToken(BuildContext context) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? authToken = prefs.getString('auth_token');
+
+  if (authToken == null) {
+    Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, '/login');
   }
 }

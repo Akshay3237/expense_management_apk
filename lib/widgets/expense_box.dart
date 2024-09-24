@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:expense_tracker/widgets/update_expense_form.dart'; // Import UpdateExpenseForm
-import 'package:expense_tracker/services/expense_service.dart'; // Import ExpenseService
-import 'package:expense_tracker/models/expense_model.dart'; // Import Expense model
-import '../comonFunctions.dart'; // Import your common functions
+import 'package:expense_tracker/widgets/update_expense_form.dart';
+import 'package:expense_tracker/services/expense_service.dart';
+import 'package:expense_tracker/models/expense_model.dart';
+import '../comonFunctions.dart';
 
 class ExpenseBox extends StatefulWidget {
   final bool isFetchExpense;
@@ -37,7 +37,7 @@ class _ExpenseBoxState extends State<ExpenseBox> {
     if (userId != null) {
       final expenseService = ExpenseService();
       try {
-        final expenses = await expenseService.getAllExpenses(); // Ensure this method uses userId
+        final expenses = await expenseService.getAllExpenses();
         return expenses['expenses'].where((expense) => expense.userId == userId).toList() ?? [];
       } catch (e) {
         throw Exception('Failed to fetch expenses: $e');
@@ -84,6 +84,10 @@ class _ExpenseBoxState extends State<ExpenseBox> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double titleFontSize = screenWidth * 0.05;
+    double subtitleFontSize = screenWidth * 0.04;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -92,7 +96,7 @@ class _ExpenseBoxState extends State<ExpenseBox> {
           child: Text(
             'Expenses',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: titleFontSize,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -118,28 +122,33 @@ class _ExpenseBoxState extends State<ExpenseBox> {
 
                   return Card(
                     margin: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(16.0),
-                      title: Text('₹${expense.amount.toStringAsFixed(2)}'),
-                      subtitle: Column(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Category: ${expense.category ?? 'Unknown'}'),
-                          Text('Recurring: ${expense.recurring ? 'Yes' : 'No'}'),
-                          Text('Note: ${expense.note ?? 'No notes'}'),
-                          Text('Date: ${expense.date.toLocal().toString().split(' ')[0]}'), // Format date
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit),
-                            onPressed: () => _openUpdateExpenseForm(expense),
+                          Text(
+                            '₹${expense.amount.toStringAsFixed(2)}',
+                            style: TextStyle(fontSize: subtitleFontSize),
                           ),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () => _deleteExpense(expense.id),
+                          SizedBox(height: 8.0),
+                          Text('Category: ${expense.category ?? 'Unknown'}', style: TextStyle(fontSize: subtitleFontSize)),
+                          Text('Recurring: ${expense.recurring ? 'Yes' : 'No'}', style: TextStyle(fontSize: subtitleFontSize)),
+                          Text('Note: ${expense.note ?? 'No notes'}', style: TextStyle(fontSize: subtitleFontSize)),
+                          Text('Date: ${expense.date.toLocal().toString().split(' ')[0]}', style: TextStyle(fontSize: subtitleFontSize)),
+                          SizedBox(height: 16.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit),
+                                onPressed: () => _openUpdateExpenseForm(expense),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => _deleteExpense(expense.id),
+                              ),
+                            ],
                           ),
                         ],
                       ),

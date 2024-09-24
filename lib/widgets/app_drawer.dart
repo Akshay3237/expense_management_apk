@@ -12,7 +12,7 @@ class AppDrawer extends StatelessWidget {
               color: Colors.blue,
             ),
             child: Text(
-              'My App',
+              'Expense Management',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,

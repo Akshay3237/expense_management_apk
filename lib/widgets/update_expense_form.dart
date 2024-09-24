@@ -22,6 +22,7 @@ class _UpdateExpenseFormState extends State<UpdateExpenseForm> {
   late String _note;
   late DateTime _date;
   List<Category> _categories = [];
+  bool _isLoading = false; // Add this variable for loading state
 
   @override
   void initState() {
@@ -57,6 +58,10 @@ class _UpdateExpenseFormState extends State<UpdateExpenseForm> {
   Future<void> _updateExpense() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      setState(() {
+        _isLoading = true; // Set loading to true when the update starts
+      });
+
       final expenseService = ExpenseService();
       final updatedExpense = Expense(
         id: widget.expense.id,
@@ -67,6 +72,7 @@ class _UpdateExpenseFormState extends State<UpdateExpenseForm> {
         date: _date,
         userId: widget.expense.userId, // Ensure userId is set
       );
+
       try {
         final result = await expenseService.updateExpense(updatedExpense.id, updatedExpense) as Map<String, Object>;
         if (result['success'] as bool) {
@@ -76,6 +82,10 @@ class _UpdateExpenseFormState extends State<UpdateExpenseForm> {
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      } finally {
+        setState(() {
+          _isLoading = false; // Set loading to false when the update completes
+        });
       }
     }
   }
@@ -93,80 +103,90 @@ class _UpdateExpenseFormState extends State<UpdateExpenseForm> {
       appBar: AppBar(
         title: Text('Update Expense'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                initialValue: _amount.toString(),
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Amount'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter an amount';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _amount = double.parse(value!);
-                },
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextFormField(
+                      initialValue: _amount.toString(),
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(labelText: 'Amount'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an amount';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _amount = double.parse(value!);
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _category.isEmpty ? null : _category,
+                      decoration: InputDecoration(labelText: 'Category'),
+                      items: _categories.map((cat) {
+                        return DropdownMenuItem<String>(
+                          value: cat.id,
+                          child: Text(cat.name),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          _category = value!;
+                        });
+                      },
+                      onSaved: (value) {
+                        _category = value!;
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    SwitchListTile(
+                      title: Text('Recurring'),
+                      value: _recurring,
+                      onChanged: (value) {
+                        setState(() {
+                          _recurring = value;
+                        });
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      initialValue: _note,
+                      decoration: InputDecoration(labelText: 'Note'),
+                      onSaved: (value) {
+                        _note = value!;
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    TextFormField(
+                      initialValue: _date.toLocal().toString().split(' ')[0],
+                      decoration: InputDecoration(labelText: 'Date'),
+                      onSaved: (value) {
+                        _date = DateTime.parse(value!);
+                      },
+                    ),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _updateExpense,
+                      child: Text('Update Expense'),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _category.isEmpty ? null : _category,
-                decoration: InputDecoration(labelText: 'Category'),
-                items: _categories.map((cat) {
-                  return DropdownMenuItem<String>(
-                    value: cat.id,
-                    child: Text(cat.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _category = value!;
-                  });
-                },
-                onSaved: (value) {
-                  _category = value!;
-                },
-              ),
-              SizedBox(height: 16),
-              SwitchListTile(
-                title: Text('Recurring'),
-                value: _recurring,
-                onChanged: (value) {
-                  setState(() {
-                    _recurring = value;
-                  });
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                initialValue: _note,
-                decoration: InputDecoration(labelText: 'Note'),
-                onSaved: (value) {
-                  _note = value!;
-                },
-              ),
-              SizedBox(height: 16),
-              TextFormField(
-                initialValue: _date.toLocal().toString().split(' ')[0],
-                decoration: InputDecoration(labelText: 'Date'),
-                onSaved: (value) {
-                  _date = DateTime.parse(value!);
-                },
-              ),
-              SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _updateExpense,
-                child: Text('Update Expense'),
-              ),
-            ],
+            ),
           ),
-        ),
+          if (_isLoading) // Show progress indicator when loading
+            Center(
+              child: CircularProgressIndicator(),
+            ),
+        ],
       ),
     );
   }
